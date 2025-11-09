@@ -1,4 +1,4 @@
-import { pgTable, serial, text, jsonb, vector, pgTableCreator } from "drizzle-orm/pg-core";
+import { serial, text, jsonb, vector, pgTableCreator } from "drizzle-orm/pg-core";
 
 export const createTable = pgTableCreator((name) => `${name}`);
 
