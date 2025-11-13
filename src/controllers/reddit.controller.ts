@@ -60,4 +60,40 @@ export const RedditController = {
       res.status(500).json({ error: "Search and index failed" });
     }
   },
+
+  async streamAsk(req: Request, res: Response) {
+    try {
+      const { question, includeComments = false, options = {} } = req.body;
+
+      if (!question) {
+        res.status(400).json({ error: "Question is required" });
+        return;
+      }
+
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
+
+      const sendEvent = (type: string, data: unknown) => {
+        res.write(`data: ${JSON.stringify({ type, data })}\n\n`);
+      };
+
+      try {
+        await RedditService.askWithStreaming(
+          question,
+          includeComments,
+          options,
+          sendEvent
+        );
+        res.end();
+      } catch (error) {
+        sendEvent('error', { message: error instanceof Error ? error.message : 'Unknown error occurred' });
+        res.end();
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Stream failed" });
+    }
+  },
 };
