@@ -1,17 +1,45 @@
+import ky from "ky";
 import { NextResponse } from "next/server";
+import { SearchResponse } from "@/types/search";
+
+const PORT = process.env.PORT || 3001;
 
 export const GET = async (request: Request) => {
-  return new Response("Search API is running");
+    return new Response("Search API is running");
 }
 
 export const POST = async (req: Request) => {
-  const { query } = await req.json();
-  console.log("Received search query:", query);
+    try {
+        const { query } = await req.json();
 
-  const results = [
-    { id: 1, title: "First result for " + query },
-    { id: 2, title: "Second result for " + query },
-  ];
+        if (!query) {
+            return NextResponse.json(
+                { error: "Query is required" },
+                { status: 400 }
+            );
+        }
 
-  return NextResponse.json({ results });
+        console.log("Received search query:", query);
+
+        const data = await ky.post(`http://localhost:${PORT}/reddit/ask`, {
+            json: {
+                question: query,
+                includeComments: false,
+                options: {}
+            },
+            timeout: 60000,
+        }).json<SearchResponse>();
+
+        console.log("Search results:", data);
+
+        return NextResponse.json(data);
+    } catch (error) {
+        console.error("Search API error:", error);
+        return NextResponse.json(
+            {
+                error: error instanceof Error ? error.message : "Search failed",
+            },
+            { status: 500 }
+        );
+    }
 }

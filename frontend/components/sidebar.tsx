@@ -18,6 +18,7 @@ import {
     MoreHorizontalIcon,
     SearchSlash,
     ChevronRight,
+    Search,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -75,6 +76,12 @@ const Sidebar = () => {
                 </div>
 
                 <div className="mt-6 flex flex-col gap-1">
+                    <SidebarLink
+                        open={open}
+                        href="/"
+                        icon={<Search size={18} />}
+                        label="Search"
+                    />
                     <SidebarLink
                         open={open}
                         href="/search/recent"

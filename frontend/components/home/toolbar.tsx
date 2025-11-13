@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ky from "ky";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -9,19 +9,18 @@ import { Search } from "lucide-react";
 const Toolbar = () => {
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-    const handleSearch = async () => {
+    const handleSearch = () => {
         if (!query.trim()) return;
         setLoading(true);
 
         try {
-            const data = await ky
-                .post("/api/search", { json: { query } })
-                .json();
-            console.log("Search results:", data);
+            const conversationId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+            
+            router.push(`/${conversationId}?q=${encodeURIComponent(query.trim())}`);
         } catch (error) {
-            console.error("Search error:", error);
-        } finally {
+            console.error("Navigation error:", error);
             setLoading(false);
         }
     };
