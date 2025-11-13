@@ -1,4 +1,4 @@
-import { SearchResults } from '@/components/chat/search-results';
+import SearchResults from '@/components/chat/search-results';
 import e from 'express';
 
 type props = {
